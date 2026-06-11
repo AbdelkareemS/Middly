@@ -1,0 +1,35 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users collection
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && request.auth.uid == userId;
+      allow delete: if false; // Users shouldn't be deleted directly from client
+    }
+
+    // Projects collection
+    match /projects/{projectId} {
+      // Freelancer can read their own projects, Client can read shared projects
+      allow read: if request.auth != null && (
+        resource.data.freelancerId == request.auth.uid || 
+        resource.data.clientId == request.auth.uid
+      );
+      
+      // Project creation is DENIED from client. 
+      // It must go through the 'createProject' Cloud Function to enforce the 10-limit check.
+      allow create: if false; 
+      
+      // Freelancers can update their projects (e.g. changing status or price)
+      // Clients can update projects if they are assigned (e.g. uploading receipt)
+      allow update: if request.auth != null && (
+        resource.data.freelancerId == request.auth.uid || 
+        (resource.data.clientId == request.auth.uid || resource.data.clientId == "")
+      );
+      
+      allow delete: if false; // Projects are not deleted, maybe just marked as archived later
+    }
+  }
+}

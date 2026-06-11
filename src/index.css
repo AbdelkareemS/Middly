@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-kinetic: 'Space Grotesk', sans-serif;
+  
+  /* Kinetic Typography palette */
+  --color-kinetic-bg: #09090B;
+  --color-kinetic-fg: #FAFAFA;
+  --color-kinetic-muted: #27272A;
+  --color-kinetic-muted-fg: #A1A1AA;
+  --color-kinetic-accent: #DFE104; /* Acid Yellow */
+  --color-kinetic-border: #3F3F46;
+}
+
+body {
+  @apply bg-kinetic-bg text-kinetic-fg font-kinetic antialiased uppercase tracking-tighter;
+}
+
+/* Base interactive elements styling */
+.kinetic-btn {
+  @apply border-2 border-kinetic-border bg-transparent text-kinetic-fg font-bold uppercase tracking-tighter leading-none transition-all duration-75 outline-none;
+  border-radius: 0;
+}
+
+.kinetic-btn:hover, .kinetic-btn:focus-visible {
+  @apply border-kinetic-accent bg-kinetic-accent text-kinetic-bg;
+}
+
+.kinetic-btn:active {
+  @apply scale-[0.98];
+}
+
+.kinetic-input {
+  @apply border-2 border-kinetic-border bg-kinetic-bg text-kinetic-fg px-4 py-3 focus:outline-none focus:border-kinetic-accent transition-colors font-medium uppercase tracking-tighter;
+  border-radius: 0;
+}
+
+.kinetic-card {
+  @apply border-2 border-kinetic-border bg-kinetic-bg p-6 relative overflow-hidden;
+  border-radius: 0;
+}
+
+/* Watermark overlay */
+.watermark-overlay {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='100px' width='100px'><text transform='translate(20, 100) rotate(-45)' fill='rgba(223, 225, 4, 0.2)' font-size='20' font-family='Space Grotesk' font-weight='700'>MIDDLY PREVIEW</text></svg>");
+}
+
+/* Infinite Marquee */
+.marquee-container {
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+  width: 100%;
+}
+
+.marquee-content {
+  display: inline-block;
+  animation: marquee 20s linear infinite;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Custom Scrollbar for brutalist feel */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-kinetic-bg);
+  border-left: 1px solid var(--color-kinetic-border);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-kinetic-muted);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-kinetic-accent);
+}
