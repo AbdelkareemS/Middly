@@ -53,15 +53,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return unsubscribe;
   }, []);
 
+  const handleSignup = async (...args: Parameters<typeof signUp>) => {
+    const profile = await signUp(...args);
+    setUserProfile(profile);
+    return profile;
+  };
+
+  const handleLogin = async (email: string, password: string) => {
+    const user = await logIn(email, password);
+    const profile = await getUserProfile(user.uid);
+    setUserProfile(profile);
+    setCurrentUser(user);
+    return user;
+  };
+
+  const handleGoogleLogin = async () => {
+    const profile = await signInWithGooglePopup();
+    setUserProfile(profile);
+    return profile;
+  };
+
+  const handleLogout = async () => {
+    await logOut();
+    setUserProfile(null);
+    setCurrentUser(null);
+  };
+
   const value = {
     currentUser,
     userProfile,
     loading,
-    signup: signUp,
-    login: logIn,
-    logout: logOut,
+    signup: handleSignup,
+    login: handleLogin,
+    logout: handleLogout,
     resetPassword,
-    loginWithGoogle: signInWithGooglePopup,
+    loginWithGoogle: handleGoogleLogin,
   };
 
   return (
