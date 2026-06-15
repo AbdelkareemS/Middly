@@ -2,6 +2,7 @@ import React from 'react';
 import type { Project } from '../types/types';
 import { deleteProject } from '../services/projectService';
 import toast from 'react-hot-toast';
+import { ConfirmDialog } from './ui/ConfirmDialog';
 
 interface ProjectCardProps {
   project: Project;
@@ -17,6 +18,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   onFinishProject,
 }) => {
   const [deleting, setDeleting] = React.useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
 
   const copyLink = () => {
     const url = `${window.location.origin}/view/${project.projectId}?token=${project.accessToken}`;
@@ -25,11 +27,11 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('DELETE THIS PROJECT? (THIS DELETES S3 FILES)')) return;
     try {
       setDeleting(true);
       await deleteProject(project.projectId);
       onRefresh();
+      setShowDeleteConfirm(false);
     } catch (err) {
       console.error(err);
       toast.error('ERROR // FAILED TO DELETE');
@@ -62,6 +64,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   const isCompleted = project.status === 'completed';
 
   return (
+    <>
     <div className={`kinetic-card flex flex-col transition-all ${isCompleted ? 'opacity-50 grayscale' : `hover:border-kinetic-fg ${borderHighlight}`}`}>
       
       {/* Brutalist Header */}
@@ -113,7 +116,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         )}
 
         <button
-          onClick={handleDelete}
+          onClick={() => setShowDeleteConfirm(true)}
           disabled={deleting}
           className="kinetic-btn w-full py-3 text-sm border-red-500/50 text-red-500/80 hover:!bg-red-500 hover:!text-white hover:!border-red-500 disabled:opacity-50"
         >
@@ -121,5 +124,21 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         </button>
       </div>
     </div>
+
+    <ConfirmDialog
+      isOpen={showDeleteConfirm}
+      onClose={() => setShowDeleteConfirm(false)}
+      onConfirm={handleDelete}
+      title="DELETE PROJECT?"
+      message="THIS WILL PERMANENTLY DELETE THE PROJECT AND ALL ASSOCIATED FILES. THIS ACTION CANNOT BE UNDONE."
+      confirmLabel="DELETE"
+      variant="danger"
+      loading={deleting}
+    >
+      <p className="text-kinetic-muted-fg font-medium tracking-tight mb-2">
+        <span className="font-bold text-kinetic-fg">{project.title}</span>
+      </p>
+    </ConfirmDialog>
+    </>
   );
 };

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { generateUploadUrl, createProject } from '../services/projectService';
 import { useAuth } from '../context/AuthContext';
 import type { FileType } from '../types/types';
+import { Modal } from './ui/Modal';
 
 interface CreateProjectModalProps {
   onClose: () => void;
@@ -69,24 +70,14 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ onClose,
   };
 
   return (
-    <div className="fixed inset-0 bg-kinetic-bg/90 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto font-kinetic text-kinetic-fg">
-      <div className="border-2 border-kinetic-border bg-kinetic-bg w-full max-w-2xl my-8 relative">
-        
-        {/* Header */}
-        <div className="border-b-2 border-kinetic-border p-6 flex justify-between items-center bg-kinetic-muted/10">
-          <h2 className="text-3xl font-bold tracking-tighter leading-none">
-            NEW PROJECT<span className="text-kinetic-accent">_</span>
-          </h2>
-          <button 
-            onClick={onClose}
-            className="text-kinetic-muted-fg hover:text-kinetic-accent transition-colors text-2xl font-bold"
-          >
-            ✕
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="p-6">
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title={<>NEW PROJECT<span className="text-kinetic-accent">_</span></>}
+      size="lg"
+      disableClose={loading}
+    >
+      <div className="p-6">
           {error && (
             <div className="bg-red-500/10 border-2 border-red-500 text-red-500 font-bold p-3 mb-6 tracking-tighter text-sm uppercase">
               {error}
@@ -156,7 +147,6 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ onClose,
             </button>
           </form>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 };

@@ -7,6 +7,7 @@ import { CreateProjectModal } from '../components/CreateProjectModal';
 import { ReceiptModal } from '../components/ReceiptModal';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 
 export const FreelancerDashboard: React.FC = () => {
   const { userProfile, logout } = useAuth();
@@ -15,6 +16,7 @@ export const FreelancerDashboard: React.FC = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [receiptProject, setReceiptProject] = useState<Project | null>(null);
   const [finishProjectId, setFinishProjectId] = useState<string | null>(null);
+  const [isFinishing, setIsFinishing] = useState(false);
 
   const fetchProjects = async () => {
     if (!userProfile?.uid) return;
@@ -50,6 +52,7 @@ export const FreelancerDashboard: React.FC = () => {
   const confirmFinishProject = async () => {
     if (!finishProjectId) return;
     try {
+      setIsFinishing(true);
       await updateProjectStatus(finishProjectId, 'completed');
       fetchProjects();
       toast.success('SUCCESS // PROJECT ARCHIVED');
@@ -57,6 +60,7 @@ export const FreelancerDashboard: React.FC = () => {
       console.error(err);
       toast.error('ERROR // FAILED TO FINISH PROJECT');
     } finally {
+      setIsFinishing(false);
       setFinishProjectId(null);
     }
   };
@@ -157,30 +161,15 @@ export const FreelancerDashboard: React.FC = () => {
         />
       )}
 
-      {finishProjectId && (
-        <div className="fixed inset-0 bg-[#09090B]/80 z-50 flex items-center justify-center p-4">
-          <div className="kinetic-card max-w-lg w-full bg-kinetic-bg text-center p-8 md:p-12 border-4 border-kinetic-border shadow-2xl">
-            <h2 className="text-4xl font-bold tracking-tighter mb-4 text-kinetic-fg">ARCHIVE PROJECT?</h2>
-            <p className="text-kinetic-muted-fg font-medium tracking-tight mb-8">
-              THIS WILL COMPLETE THE PROJECT AND FREE UP A SLOT IN YOUR ACTIVE LIMIT. THIS ACTION CANNOT BE UNDONE.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button
-                onClick={() => setFinishProjectId(null)}
-                className="kinetic-btn flex-1 py-4 text-xl border-kinetic-border text-kinetic-fg hover:bg-kinetic-muted/20"
-              >
-                CANCEL
-              </button>
-              <button
-                onClick={confirmFinishProject}
-                className="kinetic-btn flex-1 py-4 text-xl !bg-[#00FF00] !text-[#09090B] !border-[#00FF00] hover:opacity-80"
-              >
-                CONFIRM
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDialog
+        isOpen={!!finishProjectId}
+        onClose={() => setFinishProjectId(null)}
+        onConfirm={confirmFinishProject}
+        title="ARCHIVE PROJECT?"
+        message="THIS WILL COMPLETE THE PROJECT AND FREE UP A SLOT IN YOUR ACTIVE LIMIT. THIS ACTION CANNOT BE UNDONE."
+        variant="success"
+        loading={isFinishing}
+      />
 
     </div>
   );
